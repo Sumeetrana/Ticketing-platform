@@ -1,0 +1,26 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Event {
+  id             String   @id @default(uuid())
+  name           String
+  venue          String
+  startsAt       DateTime @map("starts_at") @db.Timestamptz(6)
+  capacity       Int
+  pricePerTicket Int
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt      DateTime @default(now()) @map("updated_at") @db.Timestamptz()
+
+  @@map("events")
+}
