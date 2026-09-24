@@ -37,16 +37,18 @@ export class EventsService {
             throw new NotFoundException(`Event ${eventId} not found`)
         }
 
-        const available = event.capacity - event.reserved;
+        const result = await this.prismaService.event.updateMany({
+            where: {
+                id: eventId,
+                reserved: { lte: event.capacity - quantity }
+            },
+            data: { reserved: { increment: quantity } }
+        })
 
-        if (available < quantity) {
-            throw new ConflictException(`Only ${available} tickets remaining`)
+        if (result.count == 0) {
+            throw new ConflictException(`Not enough tickets remaining.`)
         }
 
-        await this.prismaService.event.update({
-            where: { id: eventId },
-            data: { reserved: event.reserved + quantity }
-        })
 
         const hold = await this.prismaService.ticketHold.create({
             data: { eventId, quantity }
