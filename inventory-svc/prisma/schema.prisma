@@ -13,14 +13,28 @@ datasource db {
 }
 
 model Event {
-  id             String   @id @default(uuid())
+  id             String       @id @default(uuid())
   name           String
   venue          String
-  startsAt       DateTime @map("starts_at") @db.Timestamptz(6)
+  startsAt       DateTime     @map("starts_at") @db.Timestamptz(6)
   capacity       Int
-  pricePerTicket Int      @map("price_per_ticket")
-  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+  pricePerTicket Int          @map("price_per_ticket")
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt      DateTime     @updatedAt @map("updated_at") @db.Timestamptz()
+  reserved       Int          @default(0)
+  holds          TicketHold[]
 
   @@map("events")
+}
+
+model TicketHold {
+  id        String   @id @default(uuid())
+  eventId   String   @map("event_id")
+  quantity  Int
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  event Event @relation(fields: [eventId], references: [id])
+
+  @@index([eventId], map: "idx_ticket_holds_event_id")
+  @@map("ticket_holds")
 }
