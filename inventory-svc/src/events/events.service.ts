@@ -37,28 +37,30 @@ export class EventsService {
             throw new NotFoundException(`Event ${eventId} not found`)
         }
 
-        const result = await this.prismaService.event.updateMany({
-            where: {
-                id: eventId,
-                reserved: { lte: event.capacity - quantity }
-            },
-            data: { reserved: { increment: quantity } }
+        return this.prismaService.$transaction(async (tx) => {
+            const result = await tx.event.updateMany({
+                where: {
+                    id: eventId,
+                    reserved: { lte: event.capacity - quantity }
+                },
+                data: { reserved: { increment: quantity } }
+            })
+
+            if (result.count == 0) {
+                throw new ConflictException(`Not enough tickets remaining.`)
+            }
+
+
+            const hold = await tx.ticketHold.create({
+                data: { eventId, quantity }
+            })
+
+            return {
+                id: hold.id,
+                eventId: hold.eventId,
+                quantity: hold.quantity,
+                createdAt: hold.createdAt.toISOString()
+            }
         })
-
-        if (result.count == 0) {
-            throw new ConflictException(`Not enough tickets remaining.`)
-        }
-
-
-        const hold = await this.prismaService.ticketHold.create({
-            data: { eventId, quantity }
-        })
-
-        return {
-            id: hold.id,
-            eventId: hold.eventId,
-            quantity: hold.quantity,
-            createdAt: hold.createdAt.toISOString()
-        }
     }
 }
