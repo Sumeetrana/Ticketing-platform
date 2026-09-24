@@ -1,6 +1,8 @@
 export interface AppConfig {
     readonly port: number;
     readonly nodeEnv: string;
+    readonly databaseUrl: string;
+    readonly directDatabaseUrl: string;
 }
 
 function toInt(value: string | undefined, fallback: number): number {
@@ -10,5 +12,7 @@ function toInt(value: string | undefined, fallback: number): number {
 
 export default (): AppConfig => ({
     port: toInt(process.env['PORT'], 3001),
-    nodeEnv: process.env['NODE_ENV'] || 'development'
+    nodeEnv: process.env['NODE_ENV'] || 'development',
+    databaseUrl: process.env['DATABASE_URL'] || '',
+    directDatabaseUrl: process.env['DIRECT_DATABASE_URL'] || ''
 })

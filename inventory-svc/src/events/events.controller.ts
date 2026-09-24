@@ -15,7 +15,7 @@ export class EventsController {
 
     @Get(":id")
     getById(@Param('id') id: string): Promise<EventResponseDto> {
-        return this.eventsService.getById(id)
+        return this.eventsService.getById({ id })
     }
 
     @Get()

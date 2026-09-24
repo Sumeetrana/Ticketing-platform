@@ -18,9 +18,9 @@ model Event {
   venue          String
   startsAt       DateTime @map("starts_at") @db.Timestamptz(6)
   capacity       Int
-  pricePerTicket Int
+  pricePerTicket Int      @map("price_per_ticket")
   createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt      DateTime @default(now()) @map("updated_at") @db.Timestamptz()
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz()
 
   @@map("events")
 }
