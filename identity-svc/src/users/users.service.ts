@@ -14,38 +14,31 @@ export class UsersService {
     ) { }
 
     async register(payload: RegisterUserDto): Promise<UserRegisteredDto | null> {
-        console.log("Payload: ", payload.email)
-        try {
-            const user = await this.prismaService.user.findUnique({ where: { email: payload.email } })
+        const user = await this.prismaService.user.findUnique({ where: { email: payload.email } })
 
-            if (user) {
-                throw new ConflictException("User already registered")
-            }
-
-            const result = await this.prismaService.user.create({
-                data: {
-                    email: payload.email,
-                    passwordHash: await argon.hash(payload.password)
-                }
-            })
-
-            return {
-                id: result.id,
-                email: result.email,
-                role: result.role
-            }
-        } catch (error) {
-            console.log("Error: ", error)
-            throw new BadRequestException(error)
+        if (user) {
+            throw new ConflictException("User already registered")
         }
 
+        const result = await this.prismaService.user.create({
+            data: {
+                email: payload.email,
+                passwordHash: await argon.hash(payload.password)
+            }
+        })
+
+        return {
+            id: result.id,
+            email: result.email,
+            role: result.role
+        }
     }
 
     async login(payload: RegisterUserDto): Promise<LoggedInUserDto> {
         const user = await this.prismaService.user.findUnique({ where: { email: payload.email } })
 
         if (!user) {
-            throw new UnauthorizedException("User is not registered")
+            throw new UnauthorizedException("Invalid credentials")
         }
 
         if (await argon.verify(user.passwordHash, payload.password)) {
