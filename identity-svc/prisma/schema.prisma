@@ -8,14 +8,31 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
-  passwordHash String   @map("password_hash")
-  role         Role     @default(CUSTOMER)
-  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id              String           @id @default(uuid())
+  email           String           @unique
+  passwordHash    String           @map("password_hash")
+  role            Role             @default(CUSTOMER)
+  createdAt       DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+  refreshSessions RefreshSession[]
 
   @@map("users")
+}
+
+model RefreshSession {
+  id           String    @id @default(uuid())
+  userId       String    @map("user_id")
+  currentHash  String    @unique @map("current_hash")
+  previousHash String?   @unique @map("previous_hash")
+  expiresAt    DateTime  @map("expires_at") @db.Timestamptz()
+  revokedAt    DateTime? @map("revoked_at") @db.Timestamptz()
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "idx_refresh_sessions_user_id")
+  @@map("refresh_sessions")
 }
 
 enum Role {

@@ -16,7 +16,7 @@ import { ConfigService } from "@nestjs/config";
             },
             global: true
         })
-    })],
+    }), ConfigModule],
     providers: [UsersService],
     controllers: [UsersController]
 })

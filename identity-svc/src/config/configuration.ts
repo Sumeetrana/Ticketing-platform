@@ -4,6 +4,7 @@ export interface AppConfig {
     readonly databaseUrl: string;
     readonly directDatabaseUrl: string;
     readonly jwtSecret: string;
+    readonly refreshTokenTtlDays: number;
 }
 
 function toInt(value: string | undefined, fallback: number): number {
@@ -16,5 +17,6 @@ export default (): AppConfig => ({
     nodeEnv: process.env['NODE_ENV'] || 'development',
     databaseUrl: process.env['DATABASE_URL'] || '',
     directDatabaseUrl: process.env['DIRECT_DATABASE_URL'] || '',
-    jwtSecret: process.env['JWT_SECRET'] || ''
-})
+    jwtSecret: process.env['JWT_SECRET'] || '',
+    refreshTokenTtlDays: toInt(process.env['REFRESH_TOKEN_TTL_DAYS'], 7)
+}) 
