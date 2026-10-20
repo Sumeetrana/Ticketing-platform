@@ -30,7 +30,7 @@ export class EventsService {
         return this.prismaService.event.findMany()
     }
 
-    async hold(eventId: string, quantity: number): Promise<HoldResponseDto> {
+    async hold(eventId: string, quantity: number, userId: string): Promise<HoldResponseDto> {
         const event = await this.prismaService.event.findUnique({ where: { id: eventId } });
 
         if (!event) {
@@ -52,7 +52,7 @@ export class EventsService {
 
 
             const hold = await tx.ticketHold.create({
-                data: { eventId, quantity }
+                data: { eventId, quantity, userId }
             })
 
             return {
